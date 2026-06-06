@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniConnect — Protótipo Interativo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root{--brand:#E8600A;--brand2:#C44D06;--bl:#FEF0E6;--bm:#FDD5B5;--bg-primary:#fff;--bg-secondary:#F7F7F5;--bg-tertiary:#F0EEE8;--text-primary:#1A1A1A;--text-secondary:#666;--border:#E5E3DC;--border2:#D0CEC6;--radius:10px;--radius-sm:6px}
+@media(prefers-color-scheme:dark){:root{--bg-primary:#1C1C1E;--bg-secondary:#2C2C2E;--bg-tertiary:#3A3A3C;--text-primary:#F2F2F7;--text-secondary:#8E8E93;--border:#3A3A3C;--border2:#48484A}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-tertiary);color:var(--text-primary);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;padding:16px}
+.device{width:390px;background:var(--bg-primary);border-radius:40px;box-shadow:0 24px 80px rgba(0,0,0,.18);overflow:hidden;border:1px solid var(--border)}
+.status-bar{background:var(--bg-primary);padding:12px 24px 4px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600}
+.topbar{display:flex;align-items:center;gap:8px;padding:0 14px;height:48px;border-bottom:0.5px solid var(--border);background:var(--bg-primary)}
+.logo{font-size:17px;font-weight:700;flex-shrink:0}.logo span{color:var(--brand)}
+.bc-wrap{display:flex;align-items:center;gap:3px;flex:1;overflow:hidden;min-width:0}
+.bc{font-size:11px;color:var(--text-secondary);padding:2px 5px;border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap}
+.bc:hover{background:var(--bg-secondary)}
+.bc.cur{color:var(--text-primary);font-weight:600;cursor:default}
+.bc-sep{font-size:11px;color:var(--text-secondary)}
+.back-btn{display:flex;align-items:center;gap:3px;padding:5px 10px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:12px;color:var(--text-secondary);cursor:pointer;background:transparent;flex-shrink:0}
+.back-btn:hover{background:var(--bg-secondary)}
+.back-btn:disabled{opacity:.3;cursor:not-allowed}
+.main{background:var(--bg-secondary);min-height:560px;overflow-y:auto;max-height:600px}
+.scr{padding:16px}
+.nav-bottom{display:flex;border-top:0.5px solid var(--border);background:var(--bg-primary);padding-bottom:env(safe-area-inset-bottom,0)}
+.nbi{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;cursor:pointer;font-size:10px;color:var(--text-secondary);gap:2px;border:none;background:transparent}
+.nbi.on,.nbi:hover{color:var(--brand)}
+.nbi i{font-size:20px}
+.card{background:var(--bg-primary);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+.bo{background:var(--bl);color:var(--brand2)}
+.bb{background:#E6F1FB;color:#0C447C}
+.bp{background:#EEEDFE;color:#3C3489}
+.bt{background:#E1F5EE;color:#085041}
+.ba{background:#FAEEDA;color:#633806}
+.bg{background:#EAF3DE;color:#27500A}
+.bgy{background:#F1EFE8;color:#444441}
+.br{background:#FCEBEB;color:#791F1F}
+.btn{padding:7px 14px;font-size:12px;font-weight:600;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text-primary);cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--bg-secondary)}
+.btnp{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btnp:hover{background:var(--brand2)}
+.btno{border-color:var(--brand);color:var(--brand)}
+.btno:hover{background:var(--bl)}
+.ptitle{font-size:17px;font-weight:700;margin-bottom:3px}
+.psub{font-size:12px;color:var(--text-secondary);margin-bottom:14px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{text-align:center;padding:11px 6px;background:var(--bg-secondary);border-radius:var(--radius-sm)}
+.stat .n{font-size:22px;font-weight:700}
+.stat .l{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.divrow{padding:9px 0;border-bottom:0.5px solid var(--border)}
+.divrow:last-child{border-bottom:none}
+.row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:0.5px solid var(--border2);color:var(--text-secondary)}
+.tabs{display:flex;border-bottom:0.5px solid var(--border);margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font-size:12px;padding:7px 12px;border:none;background:transparent;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;flex-shrink:0}
+.tab.on{color:var(--brand);font-weight:600;border-bottom-color:var(--brand)}
+.msg-wrap{display:flex;flex-direction:column;max-height:230px;overflow-y:auto;gap:4px;margin-bottom:8px}
+.msg{max-width:85%;padding:8px 11px;border-radius:12px;font-size:13px;line-height:1.5}
+.mu{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:3px}
+.mai{align-self:flex-start;background:var(--bg-primary);border:0.5px solid var(--border);border-bottom-left-radius:3px}
+.msw{font-size:10px;font-weight:600;margin-bottom:2px;color:var(--text-secondary)}
+.ci{display:flex;gap:7px}
+.ci input{flex:1;padding:9px 12px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary)}
+.mat-card{display:flex;align-items:center;gap:10px;padding:11px;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg-primary);cursor:pointer;margin-bottom:8px;transition:border-color .15s}
+.mat-card:hover{border-color:var(--brand)}
+.mat-icon{width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.prog-bar{height:5px;background:var(--bg-secondary);border-radius:3px;overflow:hidden;margin-top:4px}
+.prog-fill{height:100%;border-radius:3px;background:var(--brand)}
+.sala-msg{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+.sala-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.sala-bubble{background:var(--bg-primary);border:0.5px solid var(--border);border-radius:8px;border-top-left-radius:2px;padding:7px 10px;font-size:12px;line-height:1.5;max-width:82%}
+.sala-name{font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:2px}
+.livro{display:flex;align-items:flex-start;gap:10px;padding:11px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-primary);margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.livro:hover{border-color:var(--brand)}
+.livro-capa{width:36px;height:48px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.streak{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.streak-day{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
+.plug{display:flex;align-items:center;gap:10px;padding:12px;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg-primary);cursor:pointer;margin-bottom:8px;transition:border-color .15s}
+.plug:hover{border-color:var(--brand)}
+.plug.sel{border:2px solid var(--brand)}
+.pi{width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.prog-sync{height:4px;background:var(--bg-secondary);border-radius:2px;overflow:hidden;margin:8px 0}
+.pf{height:100%;border-radius:2px;background:var(--brand);transition:width .5s ease}
+.sync-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)}
+.sync-item:last-child{border-bottom:none}
+.sic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.plan-card{border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--bg-primary);margin-bottom:10px}
+.plan-card.featured{border:2px solid var(--brand)}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.notif-item:last-child{border-bottom:none}
+.notif-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.toggle{width:38px;height:22px;border-radius:11px;background:var(--bg-secondary);border:0.5px solid var(--border2);position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
+.toggle.on{background:var(--brand);border-color:var(--brand)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{left:18px}
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:560px;padding:20px;background:var(--bg-secondary)}
+.login-card{background:var(--bg-primary);border:0.5px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:320px}
+.pfbtn{display:flex;align-items:center;gap:12px;padding:14px;border:0.5px solid var(--border);border-radius:var(--radius);cursor:pointer;margin-bottom:10px;background:var(--bg-primary);transition:border-color .15s}
+.pfbtn:hover{border-color:var(--brand);background:var(--bl)}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.inp{width:100%;padding:9px 12px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary);margin-bottom:10px}
+.lbl{font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block}
+.intro-bar{background:var(--brand);padding:10px 16px;text-align:center;font-size:12px;color:#fff;font-weight:500}
+</style>
+</head>
+<body>
+<div style="max-width:420px;width:100%;text-align:center;margin-bottom:12px">
+  <div style="font-size:22px;font-weight:700;color:var(--brand)">UniConnect</div>
+  <div style="font-size:13px;color:#666;margin-top:2px">Protótipo interativo — Junho 2026</div>
+</div>
+<div class="device">
+  <div class="intro-bar">Protótipo navegável — explore todas as telas!</div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>UniConnect</span>
+    <span>●●●</span>
+  </div>
+  <div id="root"></div>
+</div>
+<div style="margin-top:16px;font-size:11px;color:#888;text-align:center">
+  Use os menus de navegação abaixo de cada tela<br>
+  Botão "Voltar" no topo para navegar no histórico
+</div>
+
+<script>
+const HIST=[];
+let S={
+  screen:'login',perfil:null,tab:'home',etab:'Chat IA',etabe:'dashboard',
+  materia:null,etabMat:'hub',salaAtiva:'calc2',simConfig:{materia:'calc2',tema:'Integrais',qtd:3,tipo:'Multipla'},
+  simGlobal:false,simFeito2:false,simRespostas2:{},simResultado2:null,
+  chatMsgs:[{ai:true,text:'Olá! Sou o Professor Virtual. Conectei à sua grade de Ciência da Computação — 6º semestre, UFPR. Pergunte qualquer coisa sobre suas matérias!'}],
+  salaMsgs:{
+    calc2:[{av:'MA',bg:'#E1F5EE',c:'#085041',n:'Maria Alves (USP)',txt:'Alguém sabe como resolver a integral dupla em coordenadas polares?'},{av:'PC',bg:'#E6F1FB',c:'#0C447C',n:'Pedro Costa (UNICAMP)',txt:'Converta usando x=r·cos(θ) e y=r·sen(θ). O jacobiano vira r, então dA = r·dr·dθ.'},{av:'LF',bg:'#FAEEDA',c:'#633806',n:'Lara Fonseca (UFPR)',txt:'Tem um vídeo ótimo do MIT OpenCourseWare sobre isso!'}],
+    ed:[{av:'RF',bg:'#FCEBEB',c:'#791F1F',n:'Rafael Ferreira (USP)',txt:'Qual a diferença entre Pilha e Fila na prática?'},{av:'JS',bg:'#FEF0E6',c:'#C44D06',n:'João (você)',txt:'Pilha é LIFO — último a entrar, primeiro a sair. Fila é FIFO.'},{av:'PC',bg:'#E6F1FB',c:'#0C447C',n:'Pedro Costa (UNICAMP)',txt:'Exato! Pensa na pilha como pratos e fila como banco.'}],
+    bd:[{av:'AN',bg:'#EAF3DE',c:'#27500A',n:'Ana Neves (UFRJ)',txt:'Diferença entre JOIN e LEFT JOIN?'},{av:'MA',bg:'#E1F5EE',c:'#085041',n:'Maria Alves (USP)',txt:'JOIN retorna só quem tem correspondência. LEFT JOIN retorna todos da esquerda.'}],
+  },
+  empChatMsgs:[{eu:false,av:'JS',bg:'#EEEDFE',c:'#3C3489',n:'João Silva',txt:'Olá! Vi sua vaga de front-end e tenho muito interesse.'},{eu:true,txt:'Olá João! Perfil ótimo. Podemos marcar uma conversa esta semana?'}],
+  candidaturas:[],vagaIdx:null,candidatoIdx:null,plugStep:0,plugSel:'ufpr',syncProg:0,
+  notifs:3,plano:'free',toggles:{email:true,vaga:true,prova:true,news:false},
+  progresso:{simulados:12,acertos:78,streak:9},
+};
+
+const LABELS={login:'Login',cadastro:'Cadastro',plugin:'Conectar faculdade',planos:'Planos',
+  home:'Home',vagas:'Vagas',estudos:'Estudos',grupos:'Grupos',perfil:'Perfil',notifs:'Notificações',config:'Config',
+  dashboard:'Dashboard',vagasemp:'Vagas',candidatos:'Candidatos',busca:'Buscar',chatEmp:'Chat',
+  vagadetalhe:'Vaga',candidatodetalhe:'Candidato',materia:'Matéria',
+  grade:'Grade',ia:'Prof. Virtual',simulado:'Simulado',sala:'Sala virtual',progresso:'Progresso'};
+
+function pushH(s,t){const l=HIST[HIST.length-1];if(l&&l.s===s&&l.t===t)return;HIST.push({s,t:t||null,perfil:S.perfil});}
+function goBack(){if(HIST.length<2)return;HIST.pop();const p=HIST[HIST.length-1];S.screen=p.s;if(p.t)S.tab=p.t;if(p.perfil)S.perfil=p.perfil;render();}
+function nav(s,t){pushH(s,t||null);S.screen=s;if(t)S.tab=t;render();}
+function navTab(t){S.tab=t;nav('app',t);}
+function jumpH(i){const t=HIST[i];while(HIST.length>i+1)HIST.pop();S.screen=t.s;if(t.t)S.tab=t.t;if(t.perfil)S.perfil=t.perfil;render();}
+
+function buildBC(){
+  if(HIST.length<2)return'';
+  return HIST.slice(-4).map((h,i,arr)=>{
+    const isLast=i===arr.length-1;
+    const key=h.s==='app'?(h.t||'home'):h.s==='materia'?(h.t||'grade'):h.s;
+    const lbl=LABELS[key]||key;
+    const realIdx=HIST.length-arr.length+i;
+    if(isLast)return`<span class="bc cur">${lbl}</span>`;
+    return`<span class="bc" onclick="jumpH(${realIdx})">${lbl}</span><span class="bc-sep">›</span>`;
+  }).join('');
+}
+
+function topbar(){
+  const canBack=HIST.length>=2;
+  const bc=buildBC();
+  const hasNotif=S.notifs>0;
+  return`<div class="topbar">
+    <div class="logo">Uni<span>Connect</span></div>
+    <div class="bc-wrap">${bc||`<span class="bc cur">${LABELS[S.screen]||'App'}</span>`}</div>
+    <div style="display:flex;align-items:center;gap:6px">
+      ${S.perfil?`<div style="position:relative;cursor:pointer" onclick="navTab('notifs')"><i class="ti ti-bell" style="font-size:18px;color:var(--text-secondary)"></i>${hasNotif?`<div style="width:16px;height:16px;border-radius:50%;background:var(--brand);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;position:absolute;top:-4px;right:-5px">${S.notifs}</div>`:''}</div>`:''}
+      <button class="back-btn" onclick="goBack()" ${canBack?'':'disabled'}><i class="ti ti-arrow-left"></i> Voltar</button>
+    </div>
+  </div>`;}
+
+function render(){
+  const el=document.getElementById('root');
+  el.innerHTML=build();
+  // scroll to top on navigation
+  const main=el.querySelector('.main');
+  if(main)main.scrollTop=0;
+}
+
+const MATERIAS=[
+  {id:'calc2',nome:'Cálculo II',sem:6,prof:'Prof. Marco Aurélio',alunos:234,icon:'📐',cor:'#E6F1FB',tc:'#0C447C',status:'cursando',prog:60,tags:['Integrais','Taylor','EDOs']},
+  {id:'ed',nome:'Estrutura de Dados',sem:6,prof:'Prof. André Costa',alunos:198,icon:'🌲',cor:'#E1F5EE',tc:'#085041',status:'cursando',prog:75,tags:['Árvores','Grafos','Hash']},
+  {id:'bd',nome:'Banco de Dados',sem:6,prof:'Prof. Carla Lima',alunos:210,icon:'🗄️',cor:'#EEEDFE',tc:'#3C3489',status:'cursando',prog:45,tags:['SQL','NoSQL','Modelagem']},
+  {id:'so',nome:'Sistemas Operacionais',sem:6,prof:'Prof. Paulo Ramos',alunos:187,icon:'⚙️',cor:'#FEF0E6',tc:'#C44D06',status:'cursando',prog:30,tags:['Processos','Memória','I/O']},
+  {id:'ia',nome:'Introdução à IA',sem:6,prof:'Prof. Beatriz Souza',alunos:156,icon:'🤖',cor:'#EAF3DE',tc:'#27500A',status:'cursando',prog:20,tags:['ML','Redes Neurais','NLP']},
+  {id:'alg',nome:'Algoritmos Avançados',sem:5,prof:'Prof. Fernando Melo',alunos:143,icon:'🔢',cor:'#FAEEDA',tc:'#633806',status:'concluida',prog:100,tags:['Grafos','Complexidade','DP']},
+];
+
+const BIBLIOTECA={
+  calc2:[{tipo:'📘',titulo:'Cálculo — James Stewart Vol.2',fonte:'OpenLibrary',desc:'O livro mais usado em Cálculo no Brasil. Cobre integrais duplas e séries.'},
+    {tipo:'🎥',titulo:'Cálculo II — MIT OpenCourseWare',fonte:'YouTube',desc:'Playlist completa com 32 aulas. Legendado em português.'},
+    {tipo:'📄',titulo:'Resumo de Séries de Taylor',fonte:'PDF · USP',desc:'24 páginas com exemplos resolvidos. Departamento de Matemática da USP.'}],
+  ed:[{tipo:'📘',titulo:'Algoritmos — Cormen (CLRS)',fonte:'OpenLibrary',desc:'A bíblia de algoritmos e estruturas de dados.'},
+    {tipo:'🎥',titulo:'Estrutura de Dados em Python',fonte:'YouTube',desc:'Curso prático com implementações. 18 horas de conteúdo.'},
+    {tipo:'📄',titulo:'Complexidade e Análise',fonte:'PDF · UNICAMP',desc:'Apostila do prof. Tomás Kowaltowski. 80 páginas.'}],
+  bd:[{tipo:'📘',titulo:'Sistemas de Banco de Dados — Elmasri',fonte:'OpenLibrary',desc:'Referência mundial em bancos relacionais e SQL.'},
+    {tipo:'🎥',titulo:'SQL do zero ao avançado',fonte:'YouTube',desc:'Curso completo em português com projetos práticos.'},
+    {tipo:'📄',titulo:'Normalização e Modelagem ER',fonte:'PDF · UFMG',desc:'Apostila com exemplos práticos de modelagem.'}],
+};
+
+const QUESTOES={
+  calc2:[
+    {q:'Uma integral dupla ∬f(x,y)dA calcula:',ops:['A área de uma curva plana','O volume sob a superfície z=f(x,y)','O comprimento de arco','O gradiente vetorial'],correta:1,exp:'Integrais duplas calculam o volume sob uma superfície na região do plano xy.'},
+    {q:'O teorema de Fubini afirma que:',ops:['Toda integral calcula-se por partes','A ordem de integração pode ser invertida em funções contínuas','Toda integral dupla converge','Polares sempre simplificam'],correta:1,exp:'Fubini garante que a ordem de integração pode ser trocada em funções contínuas.'},
+    {q:'Em coordenadas polares, dA é:',ops:['dr·dθ','r²·dr·dθ','r·dr·dθ','(r+1)·dr·dθ'],correta:2,exp:'O jacobiano da transformação polar é r, portanto dA = r·dr·dθ.'},
+  ],
+  ed:[
+    {q:'Complexidade de busca em ABB balanceada?',ops:['O(1)','O(log n)','O(n)','O(n²)'],correta:1,exp:'Em ABB balanceada, altura é O(log n), garantindo busca em O(log n).'},
+    {q:'O que é uma pilha (stack)?',ops:['Estrutura FIFO','Estrutura LIFO','Lista com acesso aleatório','Árvore binária'],correta:1,exp:'Pilha é LIFO — Last In, First Out.'},
+    {q:'Tabela hash com encadeamento — complexidade de busca?',ops:['O(1) sempre','O(n) sempre','O(1) em média','O(log n) sempre'],correta:2,exp:'Com boa função hash, busca é O(1) em média.'},
+  ],
+  bd:[
+    {q:'O que é uma chave estrangeira?',ops:['Identifica unicamente cada linha','Referencia a PK de outra tabela','Índice de busca','Campo obrigatório'],correta:1,exp:'FK cria relacionamento entre tabelas referenciando a Primary Key.'},
+    {q:'Qual retorna TODOS os registros da tabela esquerda?',ops:['INNER JOIN','RIGHT JOIN','LEFT JOIN','FULL JOIN'],correta:2,exp:'LEFT JOIN retorna todos da esquerda, mesmo sem correspondência.'},
+    {q:'Normalização tem como objetivo:',ops:['Acelerar queries','Reduzir redundância e dependências','Aumentar tabelas','Simplificar código'],correta:1,exp:'Normalização elimina redundâncias e anomalias de atualização.'},
+  ],
+};
+
+const VAGAS=[
+  {b:'bo',tipo:'Estágio',t:'Dev front-end júnior',sub:'TechBR · São Paulo · R$1.500/mês',tags:['React','JavaScript','CSS'],desc:'Oportunidade para estudante de Computação. 30h semanais, horário flexível. Desenvolva interfaces modernas com React em parceria com o time de produto.'},
+  {b:'bb',tipo:'Freela',t:'Design identidade visual',sub:'Agência Criativa · Remoto · R$2.000',tags:['Figma','Branding'],desc:'Projeto 30 dias: identidade visual completa de startup de educação. Logo, paleta, tipografia e brandbook.'},
+  {b:'bp',tipo:'Emprego',t:'Analista de marketing digital',sub:'StartupX · Híbrido · R$3.200/mês',tags:['SEO','Google Ads'],desc:'Domínio em SEO, mídia paga e dados. Equipe jovem, ambiente ágil. Plano de saúde incluso.'},
+  {b:'bt',tipo:'Trainee',t:'Programa trainee — gestão',sub:'Grupo Alfa · SP · R$4.000/mês',tags:['Gestão','Liderança'],desc:'18 meses com rotação entre áreas. Formandos 2025/2026. Possibilidade de efetivação.'},
+  {b:'bg',tipo:'Bolsa',t:'Iniciação científica — IA',sub:'UFPR · Presencial · R$800/mês',tags:['Python','ML'],desc:'Bolsa PIBIC para pesquisa em ML aplicada à educação. 20h semanais.'},
+];
+
+const CANDS=[
+  {ic:'JS',n:'João Silva',s:'Comp · 6º sem · UFPR',sk:['React','JavaScript','SQL'],bg:'#EEEDFE',c:'#3C3489',st:'ba',lb:'Em análise',desc:'Estudante com projetos em React e Node. CR 8.2, 89% de presença.'},
+  {ic:'MA',n:'Maria Alves',s:'Design · 4º sem · UFRJ',sk:['Figma','CSS','Illustrator'],bg:'#E1F5EE',c:'#085041',st:'bg',lb:'Aprovado',desc:'Portfolio robusto em branding e UI/UX. 3 clientes freelancer.'},
+  {ic:'PC',n:'Pedro Costa',s:'Eng · 8º sem · USP',sk:['Python','TensorFlow','SQL'],bg:'#E6F1FB',c:'#0C447C',st:'ba',lb:'Em análise',desc:'Último semestre Eng. Computação, CR 9.0, monitor de Algoritmos.'},
+  {ic:'LF',n:'Lara Fonseca',s:'Comp · 5º sem · UNICAMP',sk:['Vue','TypeScript'],bg:'#FAEEDA',c:'#633806',st:'br',lb:'Recusado',desc:'Dev front-end Vue.js, 2 hackathons universitários.'},
+];
+
+const IA_R={
+  integral:'Integral dupla calcula o volume sob z=f(x,y) sobre uma região R. Integre primeiro em x (y constante) depois em y — ou vice-versa pelo teorema de Fubini.',
+  taylor:'Série de Taylor: f(x) = Σ f⁽ⁿ⁾(a)/n! · (x-a)ⁿ. Aproxima funções por polinômios. Ex: eˣ ≈ 1 + x + x²/2! + x³/3! + ...',
+  arvore:'ABB: cada nó tem até 2 filhos. Esquerdo < nó < direito. Busca O(log n) se balanceada. Árvore AVL e Red-Black garantem balanceamento automático.',
+  sql:'SQL CRUD: SELECT (buscar), INSERT (inserir), UPDATE (atualizar), DELETE (apagar). JOIN une tabelas pela chave. LEFT JOIN mantém todos da esquerda.',
+  hash:'Tabela hash mapeia chaves em índices via função hash. Busca O(1) em média. Colisões resolvidas por encadeamento ou endereçamento aberto.',
+  processo:'Processo = programa em execução. SO gerencia com escalonador. Algoritmos: FIFO, Round-Robin, SJF. Cada processo tem estados: pronto, executando, bloqueado.',
+  grafo:'Grafo G=(V,E): vértices e arestas. Dirigido ou não-dirigido. Algoritmos: BFS (largura), DFS (profundidade), Dijkstra (caminho mínimo), Prim/Kruskal (árvore geradora).',
+};
+
+function build(){
+  if(S.screen==='login')return bLogin();
+  if(S.screen==='cadastro')return bCadastro();
+  if(S.screen==='plugin')return bPlugin();
+  if(S.screen==='planos')return bPlanos();
+  if(S.screen==='vagadetalhe')return bVagaDet();
+  if(S.screen==='candidatodetalhe')return bCandDet();
+  if(S.screen==='materia')return bMateria();
+  if(S.perfil==='estudante')return bEst();
+  if(S.perfil==='empresa')return bEmp();
+  return bLogin();
+}
+
+function bLogin(){return`${topbar()}<div class="login-wrap">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:32px;font-weight:800;margin-bottom:4px">Uni<span style="color:var(--brand)">Connect</span></div>
+    <div style="font-size:13px;color:var(--text-secondary)">Networking · Vagas · Professor Virtual com IA</div>
+  </div>
+  <div class="login-card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:12px;text-align:center">Como deseja entrar?</div>
+    <div class="pfbtn" onclick="escolher('estudante')">
+      <div class="av" style="width:42px;height:42px;font-size:20px;background:var(--bl);color:var(--brand)"><i class="ti ti-school"></i></div>
+      <div><div style="font-size:14px;font-weight:600">Sou estudante</div><div style="font-size:12px;color:var(--text-secondary)">Vagas, Professor Virtual e networking</div></div>
+      <i class="ti ti-arrow-right" style="margin-left:auto;color:var(--text-secondary)"></i>
+    </div>
+    <div class="pfbtn" onclick="escolher('empresa')">
+      <div class="av" style="width:42px;height:42px;font-size:20px;background:#E6F1FB;color:#0C447C"><i class="ti ti-building"></i></div>
+      <div><div style="font-size:14px;font-weight:600">Sou empresa</div><div style="font-size:12px;color:var(--text-secondary)">Publicar vagas e buscar talentos</div></div>
+      <i class="ti ti-arrow-right" style="margin-left:auto;color:var(--text-secondary)"></i>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text-secondary)">Já tem conta? <span style="color:var(--brand);cursor:pointer;font-weight:600" onclick="escolher('estudante')">Entrar</span></div>
+  </div>
+</div>`;}
+
+function bCadastro(){const e=S.perfil==='estudante';return`${topbar()}<div class="login-wrap">
+  <div class="login-card">
+    <span class="badge ${e?'bo':'bb'}" style="margin-bottom:10px">${e?'Estudante':'Empresa'}</span>
+    <div style="font-size:17px;font-weight:700;margin-bottom:16px">${e?'Crie sua conta':'Cadastre sua empresa'}</div>
+    <label class="lbl">${e?'Nome completo':'Razão social'}</label><input class="inp" placeholder="${e?'João Silva':'TechBR Ltda'}">
+    <label class="lbl">E-mail ${e?'universitário':'corporativo'}</label><input class="inp" placeholder="${e?'joao@ufpr.br':'contato@techbr.com'}">
+    ${e?`<label class="lbl">Faculdade e curso</label><input class="inp" placeholder="UFPR — Ciência da Computação"><label class="lbl">Semestre</label><input class="inp" placeholder="6º semestre">`:`<label class="lbl">CNPJ</label><input class="inp" placeholder="00.000.000/0001-00"><label class="lbl">Setor</label><input class="inp" placeholder="Tecnologia">`}
+    <button class="btn btnp" style="width:100%;margin-top:4px" onclick="avancar()">${e?'Criar conta →':'Entrar no painel →'}</button>
+    ${e?`<button class="btn btno" style="width:100%;margin-top:8px" onclick="nav('planos')">Ver planos e preços</button>`:''}
+  </div>
+</div>`;}
+
+function bPlanos(){return`${topbar()}<div class="scr">
+  <div class="ptitle">Planos e preços</div>
+  <div class="psub">Comece grátis. Upgrade quando precisar.</div>
+  <div class="plan-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start"><div><span class="badge bgy">Gratuito</span><div style="font-size:26px;font-weight:700;margin:6px 0 2px">R$ 0</div><div style="font-size:12px;color:var(--text-secondary)">para sempre</div></div><i class="ti ti-lock-open" style="font-size:22px;color:var(--text-secondary)"></i></div>
+    <div style="margin-top:10px;font-size:12px;line-height:1.8">✓ Feed de vagas limitado<br>✓ Perfil básico<br>✓ 1 grupo de estudo<br>✗ Professor Virtual<br>✗ Plugin universitário</div>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="S.plano='free';goBack();render()">Continuar grátis</button>
+  </div>
+  <div class="plan-card featured">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start"><div><span class="badge bo">Mais popular ★</span><div style="font-size:26px;font-weight:700;color:var(--brand);margin:6px 0 2px">R$ 29</div><div style="font-size:12px;color:var(--text-secondary)">por mês · ou R$249/ano</div></div><i class="ti ti-rocket" style="font-size:22px;color:var(--brand)"></i></div>
+    <div style="margin-top:10px;font-size:12px;line-height:1.8;color:var(--text-primary)">✓ Vagas ilimitadas + match inteligente<br>✓ Professor Virtual completo com IA<br>✓ Plugin universitário ativo<br>✓ Grupos ilimitados<br>✓ Portfolio completo<br>✓ Candidatura 1 clique</div>
+    <button class="btn btnp" style="width:100%;margin-top:12px" onclick="S.plano='pro';avancar()">Assinar — R$29/mês</button>
+  </div>
+</div>`;}
+
+function bPlugin(){
+  const steps=['Faculdade','Login','Sincronizando','Pronto'];const s=S.plugStep;
+  const dots=steps.map((t,i)=>`<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;${i<s?'background:#EAF3DE;color:#27500A':i===s?'background:var(--bl);color:var(--brand2)':'background:var(--bg-secondary);color:var(--text-secondary)'}">${i<s?'<i class="ti ti-check" style="font-size:11px"></i>':i+1}</div><div style="font-size:9px;color:var(--text-secondary)">${t}</div></div>${i<steps.length-1?'<div style="flex:0 0 12px;height:0.5px;background:var(--border);margin-top:12px"></div>':''}`).join('');
+  let body='';
+  if(s===0)body=`<div style="font-size:14px;font-weight:600;margin-bottom:10px">Escolha sua plataforma</div>
+    ${[['UFPR','UFPR Virtual · Moodle','#003D7B','ufpr'],['USP','Jupiter Web — USP','#003366','usp'],['Moodle','Qualquer faculdade Moodle','#F98012','moodle'],['Bb','Blackboard · Anhanguera, Unopar','#2D2D2D','bb']].map(([ic,sub,bg,id])=>`
+    <div class="plug ${S.plugSel===id?'sel':''}" onclick="S.plugSel='${id}';render()">
+      <div class="pi" style="background:${bg};color:#fff">${ic==='UFPR'?'UFPR':ic==='USP'?'USP':ic}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${ic==='UFPR'?'UFPR Virtual':ic==='USP'?'Jupiter Web':ic==='Moodle'?'Moodle genérico':'Blackboard'}</div><div style="font-size:12px;color:var(--text-secondary)">${sub}</div></div>
+      <span class="badge ${id==='bb'?'ba':'bg'}">${id==='bb'?'Em breve':'OK'}</span>
+    </div>`).join('')}
+    <button class="btn btnp" style="width:100%;margin-top:6px" onclick="plugNext()">Continuar →</button>`;
+  else if(s===1)body=`
+    <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg-secondary);border-radius:var(--radius-sm);margin-bottom:10px"><div style="width:30px;height:30px;border-radius:6px;background:#003D7B;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700">UFPR</div><div><div style="font-size:13px;font-weight:600">UFPR Virtual</div><div style="font-size:11px;color:var(--text-secondary)">virtual.ufpr.br · SSL seguro</div></div><span class="badge bg" style="margin-left:auto"><i class="ti ti-lock" style="font-size:10px"></i> Seguro</span></div>
+    <div style="background:#FAEEDA;border:0.5px solid #BA7517;border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:#633806;margin-bottom:10px"><i class="ti ti-shield-check"></i> Sua senha nunca é armazenada pelo UniConnect.</div>
+    <label class="lbl">Login UFPR</label><input class="inp" placeholder="GRR20240001 ou nome@ufpr.br">
+    <label class="lbl">Senha</label><input class="inp" type="password" placeholder="Mesma senha do UFPR Virtual">
+    <button class="btn btnp" style="width:100%;margin-top:4px" onclick="plugNext()">Conectar conta</button>`;
+  else if(s===2)body=`
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px" id="plbl">Autenticando com UFPR Virtual...</div>
+    <div class="prog-sync"><div class="pf" id="pf" style="width:${S.syncProg}%"></div></div>
+    ${[['disc','Disciplinas matriculadas'],['agenda','Agenda e calendário'],['provas','Provas e entregas'],['colegas','Colegas de turma']].map(([id,n])=>`
+    <div class="sync-item"><div class="sic" id="sic-${id}" style="background:var(--bg-secondary)"><i class="ti ti-loader" style="font-size:12px;color:var(--text-secondary)"></i></div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:600">${n}</div><div style="font-size:12px;color:var(--text-secondary)" id="sv-${id}">Aguardando...</div></div>
+    <span class="badge bgy" id="sb-${id}">—</span></div>`).join('')}`;
+  else body=`
+    <div style="text-align:center;padding:10px 0 14px">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--bl);display:flex;align-items:center;justify-content:center;margin:0 auto 8px"><i class="ti ti-check" style="font-size:24px;color:var(--brand)"></i></div>
+      <div style="font-size:16px;font-weight:700">Tudo conectado!</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px">Sua faculdade está sincronizada</div>
+    </div>
+    <div class="g3" style="margin-bottom:12px">
+      <div class="stat"><div class="n">6</div><div class="l">Disciplinas</div></div>
+      <div class="stat"><div class="n">4</div><div class="l">Provas</div></div>
+      <div class="stat"><div class="n">38</div><div class="l">Colegas</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">AGENDA IMPORTADA — UFPR VIRTUAL</div>
+      ${[['#E24B4A','Prova — Cálculo II','Sex 12 jun · 19h · Sala 204','br','3 dias'],['#EF9F27','Entrega — Algoritmos','Seg 15 jun · 23h59','ba','6 dias'],['#1D9E75','Prova — Est. Dados','Qua 17 jun · 19h','bt','8 dias']].map(([c,t,ss,b,d])=>`
+      <div class="divrow" style="display:flex;align-items:center;gap:8px"><div style="width:9px;height:9px;border-radius:50%;background:${c};flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${t}</div><div style="font-size:12px;color:var(--text-secondary)">${ss}</div></div><span class="badge ${b}">${d}</span></div>`).join('')}
+    </div>
+    <button class="btn btnp" style="width:100%" onclick="finPlugin()">Abrir meu painel →</button>`;
+  return`${topbar()}<div style="background:var(--bg-secondary);padding:16px;min-height:560px">
+    <div style="max-width:380px;margin:0 auto">
+      <div style="display:flex;align-items:flex-start;gap:3px;margin-bottom:16px">${dots}</div>
+      <div class="card" style="margin-bottom:0">${body}</div>
+    </div>
+  </div>`;}
+
+function bVagaDet(){const v=VAGAS[S.vagaIdx||0];const ap=S.candidaturas.includes(S.vagaIdx||0);
+  return`${topbar()}<div class="scr">
+    <span class="badge ${v.b}" style="margin-bottom:8px">${v.tipo}</span>
+    <div style="font-size:18px;font-weight:700;margin-bottom:4px">${v.t}</div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:10px">${v.sub}</div>
+    <div class="tags" style="margin-bottom:14px">${v.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">DESCRIÇÃO</div><div style="font-size:13px;line-height:1.7">${v.desc}</div></div>
+    <div class="card"><div style="display:flex;align-items:center;gap:10px"><div class="av" style="width:38px;height:38px;font-size:13px;font-weight:700;background:#E6F1FB;color:#0C447C">TB</div><div><div style="font-size:13px;font-weight:600">TechBR</div><div style="font-size:12px;color:var(--text-secondary)">Tecnologia · SP</div></div><span class="badge bg" style="margin-left:auto"><i class="ti ti-shield-check" style="font-size:10px"></i> Verificada</span></div></div>
+    <div style="display:flex;gap:8px"><button class="btn btno" style="flex:1">Salvar</button><button class="btn ${ap?'bg':'btnp'}" style="flex:2" onclick="candidatarD()">${ap?'✓ Candidatura enviada':'Candidatar em 1 clique'}</button></div>
+  </div>`;}
+
+function bCandDet(){const c=CANDS[S.candidatoIdx||0];
+  return`${topbar()}<div class="scr">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="av" style="width:52px;height:52px;font-size:16px;font-weight:700;background:${c.bg};color:${c.c}">${c.ic}</div><div style="flex:1"><div style="font-size:17px;font-weight:700">${c.n}</div><div style="font-size:13px;color:var(--text-secondary)">${c.s}</div></div><span class="badge ${c.st}">${c.lb}</span></div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">SOBRE</div><div style="font-size:13px;line-height:1.7">${c.desc}</div></div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">HABILIDADES</div><div class="tags">${c.sk.map(s=>`<span class="tag">${s}</span>`).join('')}</div></div>
+    <div style="display:flex;gap:8px"><button class="btn" style="flex:1">Ver portfólio</button><button class="btn btnp" style="flex:1"><i class="ti ti-message"></i> Chat</button></div>
+  </div>`;}
+
+function bMateria(){
+  const m=MATERIAS.find(x=>x.id===S.materia)||MATERIAS[0];
+  const et=S.etabMat||'hub';
+  const tabs=[['hub','Hub'],['biblioteca','Biblioteca'],['simulado','Simulado'],['sala','Sala virtual']];
+  const tabbar=`<div class="tabs">${tabs.map(([id,lb])=>`<button class="tab ${et===id?'on':''}" onclick="S.etabMat='${id}';render()">${lb}</button>`).join('')}</div>`;
+  let body='';
+  if(et==='hub')body=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="mat-icon" style="background:${m.cor};color:${m.tc};width:46px;height:46px;border-radius:var(--radius);font-size:22px">${m.icon}</div><div><div style="font-size:17px;font-weight:700">${m.nome}</div><div style="font-size:12px;color:var(--text-secondary)">${m.prof} · ${m.sem}º sem · ${m.alunos} alunos na plataforma</div></div></div>
+    <div class="g2" style="margin-bottom:12px"><div class="stat"><div class="n" style="color:var(--brand)">${m.prog}%</div><div class="l">Estudado</div></div><div class="stat"><div class="n">${m.alunos}</div><div class="l">Na plataforma</div></div></div>
+    <div class="tags" style="margin-bottom:14px">${m.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="g2" style="margin-bottom:8px"><button class="btn btnp" onclick="S.etabMat='biblioteca';render()"><i class="ti ti-books"></i> Biblioteca</button><button class="btn btno" onclick="S.etabMat='simulado';render()"><i class="ti ti-file-check"></i> Simulado</button></div>
+    <div class="g2"><button class="btn btno" onclick="S.etabMat='sala';render()"><i class="ti ti-users"></i> Sala virtual</button><button class="btn btno" onclick="navTab('ia')"><i class="ti ti-robot"></i> Prof. Virtual</button></div>
+    <div class="card" style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">PRÓXIMAS AVALIAÇÕES</div>
+    <div class="divrow row"><div><div style="font-size:13px;font-weight:600">Prova P2</div><div style="font-size:12px;color:var(--text-secondary)">Sex 12 jun · 19h · Sala 204</div></div><span class="badge br">Em 3 dias</span></div>
+    <div class="divrow row"><div><div style="font-size:13px;font-weight:600">Entrega — Lista 4</div><div style="font-size:12px;color:var(--text-secondary)">Seg 15 jun · 23h59</div></div><span class="badge ba">Em 6 dias</span></div></div>`;
+  else if(et==='biblioteca'){const livros=(BIBLIOTECA[m.id]||BIBLIOTECA.calc2);body=`
+    <div style="font-size:14px;font-weight:700;margin-bottom:4px">Biblioteca — ${m.nome}</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">Conteúdos selecionados pelo Professor Virtual</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px"><button class="btn btnp" style="font-size:11px">Todos</button><button class="btn" style="font-size:11px">📘 eBooks</button><button class="btn" style="font-size:11px">🎥 Vídeos</button><button class="btn" style="font-size:11px">📄 PDFs</button></div>
+    ${livros.map(l=>`<div class="livro"><div class="livro-capa" style="background:${m.cor}">${l.tipo}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">${l.titulo}</div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">${l.fonte}</div><div style="font-size:12px;color:var(--text-secondary);line-height:1.4">${l.desc}</div></div><i class="ti ti-external-link" style="color:var(--text-secondary);font-size:16px;flex-shrink:0;margin-top:2px"></i></div>`).join('')}`;}
+  else if(et==='simulado'){const qs=QUESTOES[m.id]||QUESTOES.calc2;
+    if(!S.simFeitoMat)body=`
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">Simulado — ${m.nome}</div>
+      ${qs.map((q,i)=>`<div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">QUESTÃO ${i+1}/${qs.length}</div><div style="font-size:13px;margin-bottom:10px;line-height:1.5">${q.q}</div>${q.ops.map((op,j)=>`<label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;margin-bottom:7px;cursor:pointer;line-height:1.4"><input type="radio" name="qm${i}" value="${j}" style="margin-top:2px;flex-shrink:0;accent-color:var(--brand)"> ${op}</label>`).join('')}</div>`).join('')}
+      <button class="btn btnp" style="width:100%" onclick="corrigirMat()">Corrigir simulado</button>`;
+    else{const res=S.simResMatRes||{ac:0,total:qs.length};body=`
+      <div style="text-align:center;padding:12px 0 16px">
+        <div style="font-size:38px;font-weight:800;color:var(--brand)">${res.ac}/${res.total}</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${res.ac===res.total?'Perfeito! 🎉':res.ac>=res.total/2?'Bom trabalho! Revise os erros.':'Revise o conteúdo!'}</div>
+        <span class="badge ${res.ac===res.total?'bg':res.ac>=res.total/2?'ba':'br'}" style="margin-top:8px;display:inline-block">${Math.round(res.ac/res.total*100)}% de acerto</span>
+      </div>
+      ${qs.map((q,i)=>{const resp=S.simResMatD?.[i];const certo=resp===q.correta;return`<div class="card" style="border-left:3px solid ${certo?'#3B6D11':'#A32D2D'}"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><i class="ti ti-${certo?'check':'x'}" style="color:${certo?'var(--color-text-success,#27500A)':'#A32D2D'}"></i><span style="font-size:12px;font-weight:700;color:${certo?'#27500A':'#A32D2D'}">${certo?'Correto':'Incorreto'}</span></div><div style="font-size:13px;margin-bottom:6px">${q.q}</div><div style="font-size:12px;padding:5px 8px;background:#EAF3DE;border-radius:5px;color:#27500A;margin-bottom:5px">✓ ${q.ops[q.correta]}</div><div style="font-size:12px;color:var(--text-secondary)">${q.exp}</div></div>`;}).join('')}
+      <div style="display:flex;gap:8px;margin-top:4px"><button class="btn" style="flex:1" onclick="S.simFeitoMat=false;S.simResMatD={};render()">Tentar novamente</button><button class="btn btnp" style="flex:1" onclick="navTab('progresso')">Ver progresso</button></div>`;}}
+  else{const msgs=S.salaMsgs[m.id]||S.salaMsgs.calc2;body=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div><div style="font-size:14px;font-weight:700">Sala virtual — ${m.nome}</div><div style="font-size:11px;color:var(--text-secondary)">${m.alunos} alunos · várias faculdades do Brasil</div></div><span class="badge bg"><i class="ti ti-circle-filled" style="font-size:8px"></i> Ao vivo</span></div>
+    <div style="max-height:260px;overflow-y:auto;margin-bottom:10px" id="sm-wrap-${m.id}">${msgs.map(ms=>`<div class="sala-msg"><div class="sala-av" style="background:${ms.bg};color:${ms.c}">${ms.av}</div><div><div class="sala-name">${ms.n}</div><div class="sala-bubble">${ms.txt}</div></div></div>`).join('')}</div>
+    <div class="ci"><input id="sm-inp-${m.id}" placeholder="Poste sua dúvida..." onkeydown="if(event.key==='Enter')enviarSalaM('${m.id}')"><button class="btn btnp" onclick="enviarSalaM('${m.id}')"><i class="ti ti-send"></i></button></div>
+    <div style="margin-top:10px;padding:8px 10px;background:var(--bl);border-radius:var(--radius-sm);font-size:12px;color:var(--brand2)"><i class="ti ti-robot"></i> <b>Prof. Virtual monitora esta sala</b> — responde dúvidas sem resposta em até 5 min.</div>`;}
+  return`${topbar()}<div class="main"><div class="scr">${tabbar}${body}</div></div>`;}
+
+function bEst(){
+  const tabs=[['home','ti-home','Home'],['vagas','ti-briefcase','Vagas'],['estudos','ti-brain','Estudos'],['grupos','ti-users','Grupos'],['perfil','ti-user','Perfil']];
+  const nav=`<div class="nav-bottom">${tabs.map(([id,ic,lb])=>`<button class="nbi ${S.tab===id?'on':''}" onclick="navTab('${id}')"><i class="ti ${ic}"></i>${lb}</button>`).join('')}</div>`;
+  let c='';
+  if(S.tab==='home')c=`
+    <div class="ptitle">Olá, João Silva 👋</div>
+    <div class="psub">Seu resumo de hoje</div>
+    ${S.plano==='free'?`<div style="background:var(--bl);border:0.5px solid var(--bm);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px"><i class="ti ti-rocket" style="font-size:20px;color:var(--brand)"></i><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--brand2)">Você está no plano Gratuito</div><div style="font-size:12px;color:var(--brand2)">Upgrade para liberar o Professor Virtual</div></div><button class="btn btnp" style="font-size:11px;padding:5px 10px" onclick="nav('planos')">Upgrade</button></div>`:''}
+    <div class="g3" style="margin-bottom:10px"><div class="stat"><div class="n" style="color:var(--brand)">${S.candidaturas.length}</div><div class="l">Candidaturas</div></div><div class="stat"><div class="n">12</div><div class="l">Vagas novas</div></div><div class="stat"><div class="n">85%</div><div class="l">Perfil</div></div></div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">PRÓXIMAS PROVAS</div>
+    <div class="divrow row"><div style="font-size:13px;font-weight:600">Cálculo II</div><span class="badge br">Em 3 dias</span></div>
+    <div class="divrow row"><div style="font-size:13px;font-weight:600">Estrutura de Dados</div><span class="badge ba">Em 8 dias</span></div></div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">VAGAS RECOMENDADAS</div>
+    ${VAGAS.slice(0,2).map((v,i)=>`<div class="divrow row" style="${i===0?'padding-bottom:8px;margin-bottom:8px':''}"><div><span class="badge ${v.b}">${v.tipo}</span><div style="font-size:13px;font-weight:600;margin:3px 0 2px">${v.t}</div><div style="font-size:12px;color:var(--text-secondary)">${v.sub.split('·')[0]}</div></div><button class="btn btnp" onclick="abrirVaga(${i})">Ver</button></div>`).join('')}</div>`;
+  else if(S.tab==='vagas')c=`
+    <div class="ptitle">Vagas e oportunidades</div>
+    <div class="psub">Estágios, empregos, freelas e bolsas</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px"><input style="flex:1;padding:8px 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary)" placeholder="Buscar..."><select style="padding:8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary)"><option>Todos</option><option>Estágio</option><option>Emprego</option><option>Freela</option><option>Bolsa</option></select></div>
+    ${VAGAS.map((v,i)=>`<div class="card"><div class="row"><div style="flex:1;cursor:pointer" onclick="abrirVaga(${i})"><span class="badge ${v.b}">${v.tipo}</span><div style="font-size:13px;font-weight:600;margin:3px 0 2px">${v.t}</div><div style="font-size:12px;color:var(--text-secondary)">${v.sub}</div><div class="tags">${v.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div><div style="display:flex;flex-direction:column;gap:4px;margin-top:4px"><button class="btn btno" style="font-size:11px" onclick="abrirVaga(${i})">Detalhes</button><button class="btn ${S.candidaturas.includes(i)?'bg':'btnp'}" style="font-size:11px" onclick="candidatar(${i})">${S.candidaturas.includes(i)?'✓':'Candidatar'}</button></div></div></div>`).join('')}`;
+  else if(S.tab==='estudos'){
+    const tabs2=[['grade','Grade'],['ia','Prof. Virtual'],['simulado','Simulado'],['sala','Sala virtual'],['progresso','Progresso']];
+    const tb=`<div class="tabs">${tabs2.map(([id,lb])=>`<button class="tab ${S.etab===id?'on':''}" onclick="S.etab='${id}';render()">${lb}</button>`).join('')}</div>`;
+    let ec='';
+    if(S.etab==='grade'){
+      const cursando=MATERIAS.filter(m=>m.status==='cursando');
+      const conc=MATERIAS.filter(m=>m.status==='concluida');
+      ec=`<div class="ptitle">Grade curricular</div><div class="psub">Computação · UFPR · 6º sem · 67% concluído</div>
+        <div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Progresso da graduação</span><span style="font-size:13px;font-weight:700;color:var(--brand)">67%</span></div><div class="prog-bar" style="height:8px"><div class="prog-fill" style="width:67%"></div></div></div>
+        <div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">CURSANDO AGORA</div>
+        ${cursando.map(m=>`<div class="mat-card" onclick="abrirMateria('${m.id}')"><div class="mat-icon" style="background:${m.cor};color:${m.tc}">${m.icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">${m.nome}</div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:3px">${m.prof}</div><div class="prog-bar"><div class="prog-fill" style="width:${m.prog}%"></div></div><div style="font-size:10px;color:var(--text-secondary);margin-top:2px">${m.prog}% estudado</div></div><i class="ti ti-arrow-right" style="color:var(--text-secondary);font-size:16px"></i></div>`).join('')}
+        <div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;margin-top:4px">CONCLUÍDAS</div>
+        ${conc.map(m=>`<div class="mat-card" style="opacity:.7" onclick="abrirMateria('${m.id}')"><div class="mat-icon" style="background:${m.cor};color:${m.tc}">${m.icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${m.nome}</div><div style="font-size:12px;color:var(--text-secondary)">${m.sem}º sem · ${m.prof}</div></div><span class="badge bg">Concluída</span></div>`).join('')}`;}
+    else if(S.etab==='ia')ec=`
+      <div class="ptitle">Professor Virtual</div>
+      <div class="psub">IA conectada à sua grade — Computação · 6º sem.</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${['Integrais duplas','Árvores AVL','SQL JOIN','Processos SO','Grafos'].map(s=>`<button class="btn btno" style="font-size:11px;padding:4px 8px" onclick="sugerirP('${s}')">${s}</button>`).join('')}</div>
+      <div class="card">
+        <div class="msg-wrap" id="chat-wrap">${S.chatMsgs.map(m=>`<div style="display:flex;${m.ai?'':'justify-content:flex-end'}"><div class="msg ${m.ai?'mai':'mu'}">${m.ai?`<div class="msw">Professor Virtual</div>`:''}${m.text.replace(/\n/g,'<br>')}</div></div>`).join('')}</div>
+        <div class="ci" style="margin-top:8px"><input id="ci" placeholder="Pergunte sobre qualquer matéria..." onkeydown="if(event.key==='Enter')enviarChat()"><button class="btn btnp" onclick="enviarChat()"><i class="ti ti-send"></i></button></div>
+      </div>`;
+    else if(S.etab==='simulado'){
+      const mats=MATERIAS.filter(m=>m.status==='cursando');
+      const temas={calc2:['Integrais','Séries de Taylor','EDOs'],ed:['Árvores','Grafos','Hash'],bd:['SQL','Modelagem ER','Normalização'],so:['Processos','Memória Virtual','Escalonamento'],ia:['Regressão','Redes Neurais','NLP']};
+      const temasAtual=temas[S.simConfig.materia]||temas.calc2;
+      if(!S.simGlobal)ec=`
+        <div class="ptitle">Criar simulado</div><div class="psub">Configure sua prova com o Professor Virtual</div>
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">MATÉRIA</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">${mats.map(m=>`<button class="btn ${S.simConfig.materia===m.id?'btnp':''}" style="font-size:11px" onclick="S.simConfig.materia='${m.id}';render()">${m.icon} ${m.nome.split(' ')[0]}</button>`).join('')}</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">TEMA</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">${temasAtual.map(t=>`<button class="btn ${S.simConfig.tema===t?'btno':''}" style="font-size:11px" onclick="S.simConfig.tema='${t}';render()">${t}</button>`).join('')}</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">QUESTÕES</div>
+          <div style="display:flex;gap:6px">${[3,5,10].map(n=>`<button class="btn ${S.simConfig.qtd===n?'btnp':''}" style="flex:1" onclick="S.simConfig.qtd=${n};render()">${n}</button>`).join('')}</div>
+        </div>
+        <button class="btn btnp" style="width:100%" onclick="gerarSim()"><i class="ti ti-sparkles"></i> Gerar simulado com IA</button>`;
+      else{const qs=QUESTOES[S.simConfig.materia]||QUESTOES.calc2;
+        if(!S.simFeito2)ec=`
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div><div style="font-size:14px;font-weight:700">${MATERIAS.find(m=>m.id===S.simConfig.materia)?.icon||'📐'} ${S.simConfig.tema}</div><div style="font-size:12px;color:var(--text-secondary)">${qs.length} questões geradas</div></div><button class="btn" style="font-size:11px" onclick="S.simGlobal=false;render()">← Config.</button></div>
+          ${qs.map((q,i)=>`<div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">QUESTÃO ${i+1}</div><div style="font-size:13px;margin-bottom:10px;line-height:1.5">${q.q}</div>${q.ops.map((op,j)=>`<label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;margin-bottom:7px;cursor:pointer;line-height:1.4"><input type="radio" name="sg${i}" value="${j}" style="margin-top:2px;accent-color:var(--brand)"> ${op}</label>`).join('')}</div>`).join('')}
+          <button class="btn btnp" style="width:100%" onclick="corrigirSim2()">Corrigir e ver resultado</button>`;
+        else{const res=S.simResultado2||{acertos:0,total:qs.length};ec=`
+          <div style="text-align:center;padding:12px 0 16px"><div style="font-size:38px;font-weight:800;color:var(--brand)">${res.acertos}/${res.total}</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${res.acertos===res.total?'Nota 10! 🎉':res.acertos>=2?'Bom! Continue.':'Revise o conteúdo.'}</div><span class="badge ${res.acertos===res.total?'bg':res.acertos>=2?'ba':'br'}" style="margin-top:8px;display:inline-block">${Math.round(res.acertos/res.total*100)}%</span></div>
+          ${qs.map((q,i)=>{const resp=S.simRespostas2?.[i];const certo=resp===q.correta;return`<div class="card" style="border-left:3px solid ${certo?'#3B6D11':'#A32D2D'}"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><i class="ti ti-${certo?'check':'x'}" style="color:${certo?'#27500A':'#A32D2D'}"></i><span style="font-size:12px;font-weight:700;color:${certo?'#27500A':'#A32D2D'}">${certo?'Correto':'Incorreto'}</span></div><div style="font-size:13px;margin-bottom:5px">${q.q}</div><div style="font-size:12px;padding:5px 8px;background:#EAF3DE;border-radius:5px;color:#27500A;margin-bottom:5px">✓ ${q.ops[q.correta]}</div><div style="font-size:12px;color:var(--text-secondary)">${q.exp}</div></div>`;}).join('')}
+          <div style="display:flex;gap:8px;margin-top:6px"><button class="btn" style="flex:1" onclick="S.simGlobal=false;S.simFeito2=false;render()">Novo</button><button class="btn btnp" style="flex:1" onclick="S.etab='progresso';render()">Progresso</button></div>`;}}
+    }
+    else if(S.etab==='sala'){
+      const salaId=S.salaAtiva||'calc2';
+      const matS=MATERIAS.find(m=>m.id===salaId)||MATERIAS[0];
+      ec=`<div class="ptitle">Salas virtuais</div><div class="psub">Estude com alunos de todo o Brasil</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">${MATERIAS.filter(m=>m.status==='cursando').map(m=>`<button class="btn ${salaId===m.id?'btnp':''}" style="font-size:11px" onclick="S.salaAtiva='${m.id}';render()">${m.icon} ${m.nome.split(' ')[0]}</button>`).join('')}</div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:0.5px solid var(--border)"><div style="display:flex;align-items:center;gap:8px"><div class="mat-icon" style="background:${matS.cor};color:${matS.tc};width:32px;height:32px;border-radius:var(--radius-sm);font-size:16px">${matS.icon}</div><div><div style="font-size:13px;font-weight:700">${matS.nome}</div><div style="font-size:11px;color:var(--text-secondary)">${matS.alunos} alunos</div></div></div><span class="badge bg"><i class="ti ti-circle-filled" style="font-size:8px"></i> Ao vivo</span></div>
+          <div style="max-height:240px;overflow-y:auto;margin-bottom:10px" id="sala-gw-${salaId}">${(S.salaMsgs[salaId]||[]).map(ms=>`<div class="sala-msg"><div class="sala-av" style="background:${ms.bg};color:${ms.c}">${ms.av}</div><div><div class="sala-name">${ms.n}</div><div class="sala-bubble">${ms.txt}</div></div></div>`).join('')}</div>
+          <div class="ci"><input id="sala-gi" placeholder="Poste sua dúvida..." onkeydown="if(event.key==='Enter')enviarSalaG()"><button class="btn btnp" onclick="enviarSalaG()"><i class="ti ti-send"></i></button></div>
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:var(--bl);border-radius:var(--radius-sm);font-size:12px;color:var(--brand2)"><i class="ti ti-robot"></i> <b>Prof. Virtual monitora.</b> Dúvidas sem resposta recebem ajuda em 5 min.</div>`;}
+    else if(S.etab==='progresso'){
+      const dias=['S','T','Q','Q','S','S','D'];
+      const streak=[true,true,true,true,true,true,false,true,true,true,true,false,true,true];
+      const temas2=[{n:'Integrais',pct:82,c:'#378ADD'},{n:'Estrutura de Dados',pct:74,c:'#E8600A'},{n:'SQL',pct:61,c:'#534AB7'},{n:'SO',pct:43,c:'#1D9E75'},{n:'Intro IA',pct:35,c:'#EF9F27'}];
+      ec=`<div class="ptitle">Meu progresso</div><div class="psub">Evolução dos seus estudos</div>
+        <div class="g3" style="margin-bottom:12px"><div class="stat"><div class="n" style="color:var(--brand)">${S.progresso.simulados}</div><div class="l">Simulados</div></div><div class="stat"><div class="n" style="color:#27500A">${S.progresso.acertos}%</div><div class="l">Média acerto</div></div><div class="stat"><div class="n" style="color:var(--brand)">${S.progresso.streak}🔥</div><div class="l">Dias seguidos</div></div></div>
+        <div class="card"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">STREAK DE ESTUDOS</div><div class="streak">${streak.map((ok,i)=>`<div class="streak-day" style="background:${ok?'var(--brand)':'var(--bg-secondary)'};color:${ok?'#fff':'var(--text-secondary)'}">${dias[i%7]}</div>`).join('')}</div></div>
+        <div class="card"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">DESEMPENHO POR MATÉRIA</div>${temas2.map(t=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px">${t.n}</span><span style="font-size:12px;font-weight:700;color:${t.c}">${t.pct}%</span></div><div class="prog-bar" style="height:6px"><div class="prog-fill" style="width:${t.pct}%;background:${t.c}"></div></div></div>`).join('')}</div>
+        <div class="card"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">PONTOS FRACOS — IA IDENTIFICOU</div>${[['Coordenadas Polares','Cálculo II'],['Árvores AVL','Est. de Dados'],['Transações ACID','Banco de Dados']].map(([f,m])=>`<div class="divrow" style="display:flex;align-items:center;gap:8px"><i class="ti ti-alert-triangle" style="font-size:16px;color:var(--brand);flex-shrink:0"></i><div style="flex:1"><div style="font-size:13px;font-weight:600">${f}</div><div style="font-size:11px;color:var(--text-secondary)">${m}</div></div><button class="btn btno" style="font-size:11px" onclick="S.etab='ia';render()">Estudar</button></div>`).join('')}</div>`;}
+    c=`<div class="ptitle" style="${S.etab==='grade'||S.etab==='progresso'?'display:none':''}">Professor Virtual</div>${tb}${ec}`;
+  }
+  else if(S.tab==='grupos')c=`
+    <div class="ptitle">Meus grupos</div><div class="psub">Turmas e grupos por interesse</div>
+    ${[['bo','Turma','Cálculo II — Turma A','32 membros · UFPR',true],['bp','Turma','Estrutura de Dados — B','28 membros · UFPR',false],['bb','Curso','Programação Web — Geral','147 membros',false],['bg','Interesse','Empreendedorismo Uni','83 membros',false],['ba','Evento','Semana da Computação 2026','220 membros',false]].map(([b,tipo,nome,sub,hn])=>`
+    <div class="card" style="cursor:pointer"><div class="row"><div style="flex:1"><span class="badge ${b}">${tipo}</span><div style="font-size:13px;font-weight:600;margin:3px 0 2px">${nome}</div><div style="font-size:12px;color:var(--text-secondary)">${sub}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${hn?'<span class="badge bo">3 novas</span>':''}<button class="btn btno" style="font-size:11px">Abrir</button></div></div></div>`).join('')}`;
+  else if(S.tab==='notifs'){S.notifs=0;c=`
+    <div class="ptitle">Notificações</div><div class="psub">Atualizações recentes</div>
+    <div class="card">${[['var(--brand)','Nova vaga compatível','TechBR publicou "Dev front-end júnior"','agora'],['#1D9E75','Candidatura visualizada','Agência Criativa viu seu perfil','2h'],['#EF9F27','Lembrete de prova','Cálculo II em 3 dias!','5h'],['#534AB7','3 novos na sala virtual','Sala de Cálculo II está ativa','ontem'],['#888','Perfil 85% completo','Adicione uma foto','ontem']].map(([c2,t,sub,w])=>`<div class="notif-item"><div class="notif-dot" style="background:${c2}"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">${t}</div><div style="font-size:12px;color:var(--text-secondary)">${sub}</div></div><div style="font-size:11px;color:var(--text-secondary);flex-shrink:0">${w}</div></div>`).join('')}</div>`;}
+  else if(S.tab==='perfil')c=`
+    <div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><div class="av" style="width:52px;height:52px;font-size:17px;font-weight:700;background:var(--bl);color:var(--brand)">JS</div><div style="flex:1"><div style="font-size:17px;font-weight:700">João Silva</div><div style="font-size:12px;color:var(--text-secondary)">Computação · 6º sem · UFPR</div><div style="margin-top:4px"><span class="badge ${S.plano==='pro'?'bo':'bgy'}">${S.plano==='pro'?'★ Pro':'Gratuito'}</span></div></div><button class="btn btno" style="font-size:11px"><i class="ti ti-edit"></i></button></div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">HABILIDADES</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px"><span class="badge bb">React</span><span class="badge bb">JavaScript</span><span class="badge bp">Python</span><span class="badge bp">SQL</span><span class="badge bt">Git</span></div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">PORTFÓLIO</div>
+    <div class="divrow row" style="padding-bottom:8px;margin-bottom:8px"><div><div style="font-size:13px;font-weight:600">App de gestão de tarefas</div><div style="font-size:12px;color:var(--text-secondary)">React + Node.js</div></div><span class="badge bg">Destaque</span></div>
+    <div class="row"><div><div style="font-size:13px;font-weight:600">API REST e-commerce</div><div style="font-size:12px;color:var(--text-secondary)">Python + FastAPI</div></div><span class="badge bgy">Pessoal</span></div></div>
+    ${S.candidaturas.length?`<div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">CANDIDATURAS ATIVAS</div>${VAGAS.filter((_,i)=>S.candidaturas.includes(i)).map(v=>`<div class="divrow row"><div style="font-size:13px;font-weight:600">${v.t}</div><span class="badge ba">Em análise</span></div>`).join('')}</div>`:''}
+    <button class="btn btno" style="width:100%" onclick="nav('planos')"><i class="ti ti-rocket"></i> ${S.plano==='pro'?'Gerenciar plano':'Fazer upgrade para Pro'}</button>`;
+  else if(S.tab==='config')c=`
+    <div class="ptitle">Configurações</div><div class="psub">Personalize sua experiência</div>
+    <div class="card"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">NOTIFICAÇÕES</div>
+    ${[['email','E-mails de novidades'],['vaga','Novas vagas compatíveis'],['prova','Lembretes de prova'],['news','Newsletter semanal']].map(([k,l])=>`<div class="divrow row"><div style="font-size:13px">${l}</div><div class="toggle ${S.toggles[k]?'on':''}" onclick="S.toggles['${k}']=!S.toggles['${k}'];render()"></div></div>`).join('')}</div>
+    <div class="card"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">CONTA</div>
+    <div class="divrow row"><div style="font-size:13px">Plano atual</div><span class="badge ${S.plano==='pro'?'bo':'bgy'}">${S.plano==='pro'?'Pro — R$29/mês':'Gratuito'}</span></div>
+    <div class="divrow row"><div style="font-size:13px">Plugin UFPR Virtual</div><span class="badge bg"><i class="ti ti-check" style="font-size:10px"></i> Conectado</span></div>
+    <div class="divrow row" style="cursor:pointer" onclick="nav('planos')"><div style="font-size:13px;color:var(--brand)">Gerenciar assinatura</div><i class="ti ti-arrow-right" style="color:var(--brand)"></i></div></div>
+    <div class="card"><div class="divrow row" style="cursor:pointer" onclick="S.screen='login';S.perfil=null;HIST.length=0;HIST.push({s:'login',t:null});render()"><div style="font-size:13px;color:var(--text-secondary)">Sair da conta</div><i class="ti ti-logout" style="color:var(--text-secondary)"></i></div></div>`;
+  return`${topbar()}<div class="main"><div class="scr">${c}</div></div>${nav}`;}
+
+function bEmp(){
+  const tabs=[['dashboard','ti-layout-dashboard','Dash'],['vagasemp','ti-briefcase','Vagas'],['candidatos','ti-users','Candidatos'],['busca','ti-search','Buscar'],['chatEmp','ti-message','Chat']];
+  const nav=`<div class="nav-bottom">${tabs.map(([id,ic,lb])=>`<button class="nbi ${S.tab===id?'on':''}" onclick="navTab('${id}')"><i class="ti ${ic}"></i>${lb}</button>`).join('')}</div>`;
+  let c='';
+  if(S.tab==='dashboard')c=`
+    <div class="ptitle">Dashboard — TechBR</div><div class="psub">Vagas e candidatos em tempo real</div>
+    <div class="g2" style="margin-bottom:10px"><div class="stat"><div class="n" style="color:var(--brand)">3</div><div class="l">Vagas ativas</div></div><div class="stat"><div class="n">24</div><div class="l">Candidatos</div></div><div class="stat"><div class="n">8</div><div class="l">Novos hoje</div></div><div class="stat"><div class="n">2</div><div class="l">Entrevista</div></div></div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">CANDIDATOS RECENTES</div>${CANDS.slice(0,3).map((cd,i)=>`<div class="divrow row" style="cursor:pointer" onclick="abrirCandidato(${i})"><div style="display:flex;align-items:center;gap:8px;flex:1"><div class="av" style="width:32px;height:32px;font-size:11px;font-weight:700;background:${cd.bg};color:${cd.c}">${cd.ic}</div><div><div style="font-size:13px;font-weight:600">${cd.n}</div><div style="font-size:12px;color:var(--text-secondary)">${cd.s}</div></div></div><span class="badge ${cd.st}">${cd.lb}</span></div>`).join('')}</div>`;
+  else if(S.tab==='vagasemp')c=`
+    <div class="ptitle">Minhas vagas</div><div class="psub">Gerencie suas publicações</div>
+    <button class="btn btnp" style="width:100%;margin-bottom:12px"><i class="ti ti-plus"></i> Criar nova vaga</button>
+    ${[['Dev front-end júnior','Estágio · R$1.500/mês','12'],['Analista de dados','Emprego · R$3.800/mês','8'],['UX Designer Jr.','Estágio · R$1.200/mês','4']].map(([t,sub,cnt])=>`<div class="card"><div class="row"><div style="flex:1"><div style="display:flex;gap:5px;margin-bottom:4px"><span class="badge bt">Ativa</span><span class="badge bgy">${cnt} candidatos</span></div><div style="font-size:13px;font-weight:600">${t}</div><div style="font-size:12px;color:var(--text-secondary)">${sub}</div></div><div style="display:flex;flex-direction:column;gap:4px"><button class="btn" style="font-size:11px">Editar</button><button class="btn btno" style="font-size:11px" onclick="navTab('candidatos')">Candidatos</button></div></div></div>`).join('')}`;
+  else if(S.tab==='candidatos')c=`
+    <div class="ptitle">Candidatos</div><div class="psub">Dev front-end júnior · 12 candidatos</div>
+    ${CANDS.map((cd,i)=>`<div class="card"><div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="abrirCandidato(${i})"><div class="av" style="width:38px;height:38px;font-size:13px;font-weight:700;background:${cd.bg};color:${cd.c}">${cd.ic}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="font-size:13px;font-weight:600">${cd.n}</div><span class="badge ${cd.st}">${cd.lb}</span></div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">${cd.s}</div><div class="tags">${cd.sk.map(s=>`<span class="tag">${s}</span>`).join('')}</div></div></div><div style="display:flex;gap:6px;margin-top:8px"><button class="btn" style="flex:1;font-size:11px" onclick="abrirCandidato(${i})">Ver perfil</button><button class="btn btnp" style="flex:1;font-size:11px"><i class="ti ti-message"></i> Chat</button></div></div>`).join('')}`;
+  else if(S.tab==='busca')c=`
+    <div class="ptitle">Buscar talentos</div><div class="psub">Encontre candidatos antes de abrir vagas</div>
+    <input style="width:100%;padding:9px 12px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary);margin-bottom:8px" placeholder="Nome, habilidade ou faculdade...">
+    <div style="display:flex;gap:6px;margin-bottom:12px"><select style="flex:1;padding:8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary)"><option>Qualquer curso</option><option>Computação</option><option>Design</option></select><select style="flex:1;padding:8px;font-size:12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary)"><option>Qualquer semestre</option><option>5º ao 8º</option><option>Formado</option></select></div>
+    ${CANDS.map((cd,i)=>`<div class="card"><div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="abrirCandidato(${i})"><div class="av" style="width:38px;height:38px;font-size:13px;font-weight:700;background:${cd.bg};color:${cd.c}">${cd.ic}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">${cd.n}</div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">${cd.s}</div><div class="tags">${cd.sk.map(s=>`<span class="tag">${s}</span>`).join('')}</div></div></div><div style="display:flex;gap:6px;margin-top:8px"><button class="btn" style="flex:1;font-size:11px" onclick="abrirCandidato(${i})">Ver perfil</button><button class="btn btnp" style="flex:1;font-size:11px">Convidar</button></div></div>`).join('')}`;
+  else if(S.tab==='chatEmp')c=`
+    <div class="ptitle">Chat com candidatos</div><div class="psub">Converse diretamente com os talentos</div>
+    <div class="card" style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">CONVERSAS ATIVAS</div>
+    <div class="divrow row" style="cursor:pointer;background:var(--bl);border-radius:var(--radius-sm);padding:8px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div class="av" style="width:30px;height:30px;font-size:10px;font-weight:700;background:#EEEDFE;color:#3C3489">JS</div><div><div style="font-size:13px;font-weight:600">João Silva</div><div style="font-size:12px;color:var(--text-secondary)">Dev front-end júnior</div></div></div><span class="badge bo">Ativa</span></div>
+    <div class="divrow row" style="cursor:pointer;padding:8px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div class="av" style="width:30px;height:30px;font-size:10px;font-weight:700;background:#E1F5EE;color:#085041">MA</div><div><div style="font-size:13px;font-weight:600">Maria Alves</div><div style="font-size:12px;color:var(--text-secondary)">UX Designer Jr.</div></div></div><span class="badge bgy">Lida</span></div></div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:10px">CONVERSA COM JOÃO SILVA</div>
+    <div class="msg-wrap" style="max-height:200px" id="emp-wrap">${S.empChatMsgs.map(m=>m.eu?`<div style="display:flex;justify-content:flex-end"><div class="msg mu">${m.txt}</div></div>`:`<div class="sala-msg"><div class="sala-av" style="background:${m.bg};color:${m.c}">${m.av}</div><div><div class="sala-name">${m.n}</div><div class="sala-bubble">${m.txt}</div></div></div>`).join('')}</div>
+    <div class="ci" style="margin-top:8px"><input id="emp-ci" placeholder="Escreva uma mensagem..." onkeydown="if(event.key==='Enter')enviarEmp()"><button class="btn btnp" onclick="enviarEmp()"><i class="ti ti-send"></i></button></div></div>`;
+  else if(S.tab==='notifs'){S.notifs=0;c=`<div class="ptitle">Notificações</div><div class="psub">Atualizações da empresa</div><div class="card">${[['var(--brand)','8 novos candidatos hoje','Dev front-end júnior recebeu aplicações','agora'],['#1D9E75','João aceitou convite','Candidato confirmou interesse','1h'],['#534AB7','Vaga expirando em 2 dias','Analista de dados vence em breve','3h']].map(([c2,t,sub,w])=>`<div class="notif-item"><div class="notif-dot" style="background:${c2}"></div><div style="flex:1"><div style="font-size:13px;font-weight:600">${t}</div><div style="font-size:12px;color:var(--text-secondary)">${sub}</div></div><div style="font-size:11px;color:var(--text-secondary)">${w}</div></div>`).join('')}</div>`;}
+  return`${topbar()}<div class="main"><div class="scr">${c}</div></div>${nav}`;}
+
+function escolher(p){S.perfil=p;nav('cadastro');}
+function avancar(){if(S.perfil==='estudante')nav('plugin');else{S.tab='dashboard';nav('app','dashboard');}}
+function navTab(t){S.tab=t;nav('app',t);}
+function abrirVaga(i){S.vagaIdx=i;nav('vagadetalhe');}
+function abrirCandidato(i){S.candidatoIdx=i;nav('candidatodetalhe');}
+function abrirMateria(id){S.materia=id;S.etabMat='hub';S.simFeitoMat=false;S.simResMatD={};nav('materia');}
+function candidatar(i){if(!S.candidaturas.includes(i))S.candidaturas.push(i);render();}
+function candidatarD(){const i=S.vagaIdx||0;if(!S.candidaturas.includes(i))S.candidaturas.push(i);render();}
+function finPlugin(){S.tab='home';nav('app','home');}
+function plugNext(){if(S.plugStep===1){S.plugStep=2;render();iniciarSync();}else{S.plugStep=Math.min(S.plugStep+1,3);render();}}
+function gerarSim(){S.simGlobal=true;S.simFeito2=false;S.simRespostas2={};render();}
+function corrigirSim2(){const qs=QUESTOES[S.simConfig.materia]||QUESTOES.calc2;let ac=0;const res={};qs.forEach((_,i)=>{const r=document.querySelector(`input[name="sg${i}"]:checked`);const v=r?parseInt(r.value):-1;res[i]=v;if(v===qs[i].correta)ac++;});S.simRespostas2=res;S.simResultado2={acertos:ac,total:qs.length};S.simFeito2=true;S.progresso.simulados++;S.progresso.streak++;render();}
+function corrigirMat(){const qs=QUESTOES[S.materia]||QUESTOES.calc2;let ac=0;const d={};qs.forEach((_,i)=>{const r=document.querySelector(`input[name="qm${i}"]:checked`);const v=r?parseInt(r.value):-1;d[i]=v;if(v===qs[i].correta)ac++;});S.simResMatD=d;S.simResMatRes={ac,total:qs.length};S.simFeitoMat=true;S.progresso.simulados++;render();}
+function sugerirP(t){const inp=document.getElementById('ci');if(inp){inp.value=`Explica ${t}`;enviarChat();}}
+function enviarChat(){const inp=document.getElementById('ci');if(!inp)return;const t=inp.value.trim();if(!t)return;S.chatMsgs.push({ai:false,text:t});inp.value='';const k=Object.keys(IA_R).find(k=>t.toLowerCase().includes(k));const resp=k?IA_R[k]:'Boa pergunta! Me diga a matéria e o tópico específico que vou te ajudar com exemplos práticos.';setTimeout(()=>{S.chatMsgs.push({ai:true,text:resp});render();const w=document.getElementById('chat-wrap');if(w)w.scrollTop=w.scrollHeight;},700);render();}
+function enviarSalaM(id){const inp=document.getElementById(`sm-inp-${id}`);if(!inp)return;const t=inp.value.trim();if(!t)return;if(!S.salaMsgs[id])S.salaMsgs[id]=[];S.salaMsgs[id].push({av:'JS',bg:'var(--bl)',c:'var(--brand2)',n:'Você (João)',txt:t});inp.value='';render();const w=document.getElementById(`sm-wrap-${id}`);if(w)w.scrollTop=w.scrollHeight;}
+function enviarSalaG(){const inp=document.getElementById('sala-gi');if(!inp)return;const t=inp.value.trim();if(!t)return;const id=S.salaAtiva||'calc2';if(!S.salaMsgs[id])S.salaMsgs[id]=[];S.salaMsgs[id].push({av:'JS',bg:'var(--bl)',c:'var(--brand2)',n:'Você (João)',txt:t});inp.value='';render();const w=document.getElementById(`sala-gw-${id}`);if(w)w.scrollTop=w.scrollHeight;}
+function enviarEmp(){const inp=document.getElementById('emp-ci');if(!inp)return;const t=inp.value.trim();if(!t)return;S.empChatMsgs.push({eu:true,txt:t});inp.value='';render();}
+function iniciarSync(){const it=[{prog:25,lbl:'Autenticando com UFPR Virtual...',id:'disc',val:'6 disciplinas'},{prog:50,lbl:'Importando calendário...',id:'agenda',val:'14 eventos'},{prog:75,lbl:'Buscando provas e entregas...',id:'provas',val:'4 avaliações'},{prog:100,lbl:'Encontrando colegas...',id:'colegas',val:'38 colegas'}];let i=0;function nx(){if(i>=it.length){setTimeout(()=>{S.plugStep=3;render();},500);return;}const x=it[i];S.syncProg=x.prog;const pf=document.getElementById('pf'),pl=document.getElementById('plbl'),sic=document.getElementById('sic-'+x.id),sv=document.getElementById('sv-'+x.id),sb=document.getElementById('sb-'+x.id);if(pf)pf.style.width=x.prog+'%';if(pl)pl.textContent=x.lbl;if(sic){sic.style.background='#EAF3DE';sic.innerHTML='<i class="ti ti-check" style="font-size:11px;color:#27500A"></i>';}if(sv)sv.textContent=x.val;if(sb){sb.className='badge bg';sb.textContent='OK';}i++;setTimeout(nx,800);}setTimeout(nx,400);}
+pushH('login',null);render();
+</script>
+</body>
+</html>
